@@ -1,5 +1,4 @@
 # utils
-library(plotly)
 next_dates <- function(dates, lags) {
 
   date_seq <- sort(unique(dates))
@@ -105,6 +104,4 @@ setnames(rtn, c(as.character(3145), as.character(4978), as.character(39144)),
 rtn_tbl <- merge(weight_tbl, rtn, by.x="DATE", by.y="TRADINGDAY")
 rtn_tbl[, "RTN" := BIG * BIG_RTN + MID * MID_RTN + SMALL * SMALL_RTN]
 tmp <- merge(rtn_tbl, smb_bmk, by.x="DATE", by.y="TRADINGDAY")
-p <- plot_ly(x = ~tmp[,DATE], y = ~cumprod(1 + tmp[,RTN.x]), name = 'retrurn', type = 'scatter', mode = 'lines') %>%
-  add_trace(y = ~cumprod(1 + tmp[,RTN.y]), name = 'benchmark', mode = 'lines')
-p
+writexl::write_xlsx(tmp, "a.xlsx")
