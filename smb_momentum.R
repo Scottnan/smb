@@ -80,7 +80,7 @@ get_rtn <- function(code, date) {
 }
 
 # get weight table
-
+imbanlance_ratio <- 2
 weight_tbl <- rbind(data.table(INNERCODE = 3145, DATE = week_dates),
                     data.table(INNERCODE = 4978, DATE = week_dates),
                     data.table(INNERCODE = 39144, DATE = week_dates))
@@ -89,13 +89,21 @@ weight_tbl[, "MEAN" := rowMeans(weight_tbl[, .(SHORT, MID, LONG)])]
 weight_tbl[, c("SHORT", "MID", "LONG") := NULL]
 weight_tbl <- dcast(weight_tbl, DATE~INNERCODE)
 setnames(weight_tbl, c(as.character(3145), as.character(4978), as.character(39144)), c("BIG", "MID", "SMALL"))
-weight_tbl[, `:=` (BIG = (1 + BIG) / 3,
-                   MID = (1 + MID) / 3,
-                   SMALL = (1 + SMALL) / 3)]
+weight_tbl[, `:=` (BIG = (1 +  BIG) / 3,
+                   MID = (1 +  MID) / 3,
+                   SMALL = (1 +  SMALL) / 3)]
 weight_tbl[, `:=` (BIG = BIG / (BIG + MID + SMALL),
                    MID = MID / (BIG + MID + SMALL),
                    SMALL = SMALL / (BIG + MID + SMALL))]
-
+weight_tbl[, `:=` (BIG = imbanlance_ratio * (BIG - 1/3) + 1/3,
+                   MID = imbanlance_ratio * (MID - 1/3) + 1/3,
+                   SMALL = imbanlance_ratio * (SMALL - 1/3) + 1/3)]
+weight_tbl[BIG<0, BIG := 0]
+weight_tbl[MID<0, MID := 0]
+weight_tbl[SMALL<0, SMALL := 0]
+weight_tbl[, `:=` (BIG = BIG / (BIG + MID + SMALL),
+                   MID = MID / (BIG + MID + SMALL),
+                   SMALL = SMALL / (BIG + MID + SMALL))]
 # cal return
 rtn <- smb_idx[TRADINGDAY %in% week_dates, .(INNERCODE, TRADINGDAY, RTN)]
 rtn <- dcast(rtn, TRADINGDAY~INNERCODE)

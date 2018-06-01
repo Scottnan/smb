@@ -2,7 +2,7 @@ import pandas as pd
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 from plotly.graph_objs import *
 
-data = pd.read_excel("比例.xlsx")
+data = pd.read_excel("a.xlsx")
 trace1 = Scatter(
     x=data['DATE'],
     y=(1+data['RTN.x']).cumprod(),
